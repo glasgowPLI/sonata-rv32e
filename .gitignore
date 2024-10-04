@@ -31,3 +31,6 @@
 *.out
 *.app
 *.elf
+
+# Temporary files 
+*.swp

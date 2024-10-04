@@ -1,8 +1,10 @@
 #pragma once
+#if 0 
 #pragma push_macro("CHERIOT_PLATFORM_CUSTOM_UART")
 #define CHERIOT_PLATFORM_CUSTOM_UART
 #include_next <platform-uart.hh>
 #pragma pop_macro("CHERIOT_PLATFORM_CUSTOM_UART")
+#endif 
 
 /**
  * OpenTitan UART

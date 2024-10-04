@@ -59,8 +59,7 @@ CXX_OPTIONS = -std=c++20                                                        
               -ffreestanding                                                        \
               -fomit-frame-pointer -fno-builtin -fno-exceptions                     \
               -fno-asynchronous-unwind-tables -fno-c++-static-destructors -fno-rtti \
-              -nostartfiles -nostdlib -nodefaultlibs                              
-
+              -nostdlib
 
 BINARIES:= rv32e-bootloader.bin.vmem \
            rv32e-application.elf.uf2
