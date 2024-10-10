@@ -42,15 +42,13 @@ class DebugLED
 
     void blink(uint32_t led, uint32_t on_ms, uint32_t off_ms, uint32_t cycles)
     {
-      uint64_t delay_ms; 
-
       if (led > numLEDs)
         return;
       for (uint32_t idx = 0 ; idx < cycles; idx++) {
         this->set(led, true);
-        delay_ms = spin_wait_ms(on_ms); 
+        spin_wait_ms(on_ms); 
         this->set(led, false);
-        delay_ms = spin_wait_ms(off_ms);
+        spin_wait_ms(off_ms);
       }
     }
 

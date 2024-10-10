@@ -1,10 +1,4 @@
-#if 0  // Dejice -- compile out for sonrata-rv32e
 #pragma once
-#pragma push_macro("CHERIOT_PLATFORM_CUSTOM_UART")
-#define CHERIOT_PLATFORM_CUSTOM_UART
-#include_next <platform-uart.hh>
-#pragma pop_macro("CHERIOT_PLATFORM_CUSTOM_UART")
-#endif
 
 /**
  * OpenTitan UART
@@ -271,7 +265,4 @@ struct OpenTitanUart
 
 #ifndef CHERIOT_PLATFORM_CUSTOM_UART
 using Uart = OpenTitanUart;
-#if 0  //Dejice compile out for sonata rv32e
-static_assert(IsUart<Uart>);
-#endif
 #endif

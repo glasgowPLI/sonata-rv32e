@@ -26,6 +26,7 @@
 #include "data/payload.h"
 #endif 
 
+
 extern "C" {
   // Use a different name to avoid resolve to CHERIoT-RTOS memset symbol.
   void bl_memset(void *, int, size_t);
@@ -50,25 +51,25 @@ typedef volatile OpenTitanUart * &UartRef;
 
 [[noreturn]] void complain_and_loop(UartRef uart, const char *str)
 {
-	write_str(uart, prefix);
-	write_str(uart, str);
-	while (true) {
-		asm("wfi");
-	}
+  write_str(uart, prefix);
+  write_str(uart, str);
+  while (true) {
+    asm("wfi");
+  }
 }
 
-#if 0 
+#if DEBUG_ELF_HEADER
 static void debug_print_phdr(UartRef uart, Elf32_Phdr &phdr)
 {
-	write_str(uart, prefix);
-	write_hex(uart, phdr.p_offset);
-	write_str(uart, " ");
-	write_hex(uart, phdr.p_vaddr);
-	write_str(uart, " ");
-	write_hex(uart, phdr.p_filesz);
-	write_str(uart, " ");
-	write_hex(uart, phdr.p_memsz);
-	write_str(uart, "\r\n");
+  write_str(uart, prefix);
+  write_hex(uart, phdr.p_offset);
+  write_str(uart, " ");
+  write_hex(uart, phdr.p_vaddr);
+  write_str(uart, " ");
+  write_hex(uart, phdr.p_filesz);
+  write_str(uart, " ");
+  write_hex(uart, phdr.p_memsz);
+  write_str(uart, "\r\n");
 }
 #endif 
 
@@ -149,7 +150,6 @@ uint32_t qemu_read_elf(uint8_t *flash,
 }
 #endif // #define QEMU_DEBUG
 
-
 uint32_t read_elf(SpiFlash  &flash,
                   UartRef   uart,
                   uint8_t  *sram,
@@ -183,6 +183,14 @@ uint32_t read_elf(SpiFlash  &flash,
   Elf32_Phdr phdr;
   for (uint32_t i = 0; i < ehdr.e_phnum; i++)
   {
+    #if DEBUG_ELF_HEADER
+    write_str(uart, prefix);
+    write_str(uart, "E:");         write_hex(uart, i);
+    write_str(uart, " / 0x");      write_hex(uart, ehdr.e_phnum);
+    write_str(uart," @ addr: 0x"); write_hex(uart, ehdr.e_phoff + ehdr.e_phentsize * i);
+    write_str(uart,"\r\n");
+    #endif
+
     flash.read(ehdr.e_phoff + ehdr.e_phentsize * i,
                (uint8_t *)&phdr, sizeof(Elf32_Phdr));
 
@@ -195,21 +203,19 @@ uint32_t read_elf(SpiFlash  &flash,
 
     uint8_t *segment = phdr.p_vaddr >= (SRAM_ADDRESS + SRAM_BOUNDS) ? hyperram : sram;
     segment = (uint8_t *)phdr.p_vaddr;
-    #if 0 // not required for CHERI code
-    segment.address() = phdr.p_vaddr;
-    segment.bounds().set_inexact(phdr.p_memsz);
-
-    if (!segment.is_valid())
-    {
-      debug_print_phdr(uart, phdr);
-      complain_and_loop(uart,
-                        "Cannot get a valid capability for segment\n");
-    }
-    #endif 
 
     for (uint32_t offset = 0; offset < phdr.p_filesz; offset += 0x400)
     {
       uint32_t size = std::min(phdr.p_filesz, offset + 0x400) - offset;
+
+      #if DEBUG_ELF_HEADER
+      write_str(uart, prefix);
+      write_str(uart, "snor: 0x"); write_hex(uart, phdr.p_offset + offset);
+      write_str(uart, "-> ram: 0x");       write_hex(uart, (uint32_t)segment + offset);
+      write_str(uart,".sz: 0x");           write_hex(uart, size);
+      write_str(uart,"\r\n");
+      #endif
+
       flash.read( phdr.p_offset + offset, segment + offset, size);
     }
 
@@ -251,6 +257,7 @@ extern "C" uint32_t rom_loader_entry(void *rwRoot)
 
   spi->init(false, false, true, 0);
   uart->init(BAUD_RATE);
+  write_str(uart, "\r\n");
 
 
   /* Initialise flash */
@@ -267,8 +274,7 @@ extern "C" uint32_t rom_loader_entry(void *rwRoot)
   #endif
   debug_LED.set(ElfLoad_LED, true); 
 
-  write_str(uart, prefix);
-  write_str(uart, "Booting into program, hopefully.\r\n");
+  write_hex_with_prefix(uart, "Booting into program @ addr: ", entrypoint);
   debug_LED.set_all(false); 
   return entrypoint;
 }

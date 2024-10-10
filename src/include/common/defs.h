@@ -37,8 +37,8 @@
 #define QEMU_GPIO_ADDRESS          ((uint32_t)0x800ff000)
 #define QEMU_GPIO_ADDRESS_TOP      ((uint32_t)0x80100000)
 
-#define QEMU_UART_ADDRESS          ((uint32_t)0x80100000)
-#define QEMU_UART_ADDRESS_TOP      ((uint32_t)0x80200000)
+#define QEMU_UART_ADDRESS          ((uint32_t)0x10000000)
+#define QEMU_UART_ADDRESS_TOP      ((uint32_t)0x10000008)
 
 #define QEMU_SPI_ADDRESS           ((uint32_t)0x80200000)
 #define QEMU_SPI_ADDRESS_TOP       ((uint32_t)0x80300000)

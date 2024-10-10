@@ -18,6 +18,7 @@ _start:
     #endif
 
     la_abs t0, trap 
+    csrw   mtvec, t0
 
     /* No bounds on bootloader stack, grows down from the end of IRAM */
     la     sp, __stack_top /* __stack_top -> 0x00100ff0 */
