@@ -9,20 +9,20 @@
 
 static inline uint32_t get_mcycle(void)
 {
-	uint32_t result;
-	asm volatile("csrr %0, mcycle;" : "=r"(result));
-	return result;
+    uint32_t result;
+    __asm__ volatile("csrr %0, mcycle;" : "=r"(result));
+    return result;
 }
 
 static inline void reset_mcycle(void)
 {
-	asm volatile("csrw mcycle, x0");
+    __asm__ volatile("csrw mcycle, x0");
 }
 
 static inline void wait_mcycle(uint32_t value)
 {
-	reset_mcycle();
-	while (get_mcycle() < value) {}
+    reset_mcycle();
+    while (get_mcycle() < value) {}
 }
 
 
@@ -58,7 +58,7 @@ static inline uint64_t rdcycle64()
  */
 static inline uint64_t spin_wait_ms(uint32_t milliseconds)
 {
-  static const uint32_t CyclesPerMillisecond = CPU_TIMER_HZ / 1'000;
+  static const uint32_t CyclesPerMillisecond = CPU_TIMER_HZ / 1000;
   uint32_t cycles  = milliseconds * CyclesPerMillisecond;
   uint64_t start   = rdcycle64();
   uint64_t end     = start + cycles;
@@ -73,3 +73,13 @@ static inline uint64_t spin_wait_ms(uint32_t milliseconds)
 }
 
 
+/*
+ * start value is the value returned by 
+ * rdcycle64()
+ */
+static inline uint64_t time_elapsed_ms(uint64_t start)
+{
+  static const uint32_t CyclesPerMillisecond = CPU_TIMER_HZ / 1000;
+  uint64_t current     = rdcycle64();
+  return (current - start) / CyclesPerMillisecond;
+}
