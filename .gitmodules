@@ -1,3 +1,0 @@
-[submodule "src/micropython"]
-	path = src/micropython
-	url = git@djichthys.github.com:micropython/micropython.git
